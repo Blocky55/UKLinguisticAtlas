@@ -1,0 +1,101 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 1,
+        "name": "London",
+        "region": "Greater London",
+        "languages": 300,
+        "diversity_score": 95,
+        "fact": "London is one of the most linguistically diverse cities on Earth, with over 300 languages spoken across its boroughs."
+      },
+      "geometry": { "type": "Point", "coordinates": [-0.12, 51.51] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 2,
+        "name": "Birmingham",
+        "region": "West Midlands",
+        "languages": 100,
+        "diversity_score": 72,
+        "fact": "Birmingham has large South Asian, Caribbean, and Eastern European communities, making it one of England's most diverse cities."
+      },
+      "geometry": { "type": "Point", "coordinates": [-1.89, 52.49] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 3,
+        "name": "Manchester",
+        "region": "Greater Manchester",
+        "languages": 100,
+        "diversity_score": 68,
+        "fact": "Manchester has significant South Asian, Chinese, and Eastern European communities alongside a historically strong Irish diaspora."
+      },
+      "geometry": { "type": "Point", "coordinates": [-2.24, 53.48] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 4,
+        "name": "Glasgow",
+        "region": "Scotland",
+        "languages": 50,
+        "diversity_score": 45,
+        "fact": "Glasgow has a long history of Irish immigration and has seen growing South Asian and refugee communities since the 1990s."
+      },
+      "geometry": { "type": "Point", "coordinates": [-4.25, 55.86] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 5,
+        "name": "Cardiff",
+        "region": "Wales",
+        "languages": 40,
+        "diversity_score": 38,
+        "fact": "Cardiff has a growing diverse population and is home to one of the oldest Black communities in the UK in Tiger Bay."
+      },
+      "geometry": { "type": "Point", "coordinates": [-3.18, 51.48] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 6,
+        "name": "Leeds",
+        "region": "West Yorkshire",
+        "languages": 80,
+        "diversity_score": 58,
+        "fact": "Leeds has large South Asian communities particularly in Beeston and Harehills, alongside significant Eastern European populations."
+      },
+      "geometry": { "type": "Point", "coordinates": [-1.55, 53.80] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 7,
+        "name": "Bristol",
+        "region": "South West England",
+        "languages": 60,
+        "diversity_score": 52,
+        "fact": "Bristol has deep historical ties to the transatlantic slave trade and today has a vibrant Caribbean and African community in St Pauls."
+      },
+      "geometry": { "type": "Point", "coordinates": [-2.59, 51.45] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 8,
+        "name": "Belfast",
+        "region": "Northern Ireland",
+        "languages": 30,
+        "diversity_score": 28,
+        "fact": "Belfast has seen rapid diversification since the 2000s with growing Chinese, South Asian, and Eastern European communities."
+      },
+      "geometry": { "type": "Point", "coordinates": [-5.93, 54.60] }
+    }
+  ]
+}
