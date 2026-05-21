@@ -1,84 +1,135 @@
-const DIALECT_COLOURS = [
-  { name: 'Mancunian', color: '#38d9a9' },
-  { name: 'Scouse', color: '#ffd43b' },
-  { name: 'Welsh English', color: '#e03131' },
-  { name: 'Cockney', color: '#7950f2' },
-  { name: 'Geordie', color: '#f76707' },
+import { useState } from 'react'
+import Icon from './Icons'
+
+const DIALECTS = [
+  { name: 'Mancunian',     color: '#2c6e7a' },
+  { name: 'Scouse',        color: '#c89b3c' },
+  { name: 'Welsh English', color: '#a23a3a' },
+  { name: 'Cockney',       color: '#6a4d80' },
+  { name: 'Geordie',       color: '#c4622d' },
 ]
 
-const LANGUAGE_COLOURS = [
-  { name: 'Welsh', color: '#4ecdc4' },
-  { name: 'Scottish Gaelic', color: '#45b7d1' },
-  { name: 'Irish', color: '#96ceb4' },
-  { name: 'Scots', color: '#88d8a3' },
-  { name: 'Cornish', color: '#ffd93d' },
+const LANGUAGES = [
+  { name: 'Welsh',           color: '#2e7d8f' },
+  { name: 'Scottish Gaelic', color: '#4a6fa0' },
+  { name: 'Irish',           color: '#5d8a64' },
+  { name: 'Scots',           color: '#6b9c70' },
+  { name: 'Cornish',         color: '#b8943a' },
 ]
 
-const DIVERSITY_COLOURS = [
-  { name: 'High diversity', color: '#e03131' },
-  { name: 'Medium diversity', color: '#ffd43b' },
-  { name: 'Lower diversity', color: '#45b7d1' },
+const LAYERS = [
+  {
+    id: 'dialects',
+    label: 'Dialects',
+    iconName: 'quote',
+    title: 'Dialect Regions',
+    desc: 'Spoken varieties of English. Hover or tap a region to see characteristic phrases.',
+    items: DIALECTS,
+  },
+  {
+    id: 'languages',
+    label: 'Languages',
+    iconName: 'languages',
+    title: 'Indigenous Languages',
+    desc: 'Celtic and historic languages of the British Isles, including UNESCO-classified endangered tongues.',
+    items: LANGUAGES,
+  },
+  {
+    id: 'diversity',
+    label: 'Diversity',
+    iconName: 'globe',
+    title: 'Linguistic Diversity',
+    desc: 'Number of languages spoken in major cities, scaled 0–100 by community count.',
+    items: null,
+  },
 ]
 
-const Legend = ({ activeLayer, onLayerChange }) => {
-  const layers = [
-    { id: 'dialects', label: 'Dialect Regions' },
-    { id: 'languages', label: 'Indigenous Languages' },
-    { id: 'diversity', label: 'Diversity Index' },
-  ]
-
-  const swatches =
-    activeLayer === 'dialects' ? DIALECT_COLOURS :
-    activeLayer === 'languages' ? LANGUAGE_COLOURS :
-    DIVERSITY_COLOURS
+const Legend = ({ activeLayer, onLayerChange, stacked, onStackedChange }) => {
+  const [collapsed, setCollapsed] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches
+  )
+  const layer = LAYERS.find(l => l.id === activeLayer) || LAYERS[0]
 
   return (
-    <div className="legend">
-      {/* Layer toggles */}
-      {layers.map(layer => (
+    <aside className="legend" aria-label="Map legend">
+      <div className="legend__head">
+        <span className="legend__kicker">Layer</span>
         <button
-          key={layer.id}
-          className={`legend__btn ${activeLayer === layer.id ? 'legend__btn--active' : ''}`}
-          onClick={() => onLayerChange(layer.id)}
+          className="legend__collapse"
+          onClick={() => setCollapsed(c => !c)}
+          aria-label={collapsed ? 'Expand legend' : 'Collapse legend'}
         >
-          {layer.label}
+          <Icon name={collapsed ? 'chevronUp' : 'chevronDown'} size={14} />
         </button>
-      ))}
+      </div>
 
-      {/* Colour swatches */}
-      <div style={{
-        marginTop: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '6px',
-      }}>
-        {swatches.map(({ name, color }) => (
-          <div
-            key={name}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
+      <div className="legend__tabs" role="tablist">
+        {LAYERS.map(l => (
+          <button
+            key={l.id}
+            role="tab"
+            aria-selected={activeLayer === l.id}
+            className={`legend__tab ${activeLayer === l.id ? 'legend__tab--active' : ''}`}
+            onClick={() => onLayerChange(l.id)}
           >
-            <div style={{
-              width: '10px',
-              height: '10px',
-              borderRadius: '50%',
-              background: color,
-              flexShrink: 0,
-            }} />
-            <span style={{
-              color: '#a8c4d4',
-              fontSize: '12px',
-              fontFamily: 'var(--font)',
-            }}>
-              {name}
-            </span>
-          </div>
+            <Icon name={l.iconName} size={13} />
+            {l.label}
+          </button>
         ))}
       </div>
-    </div>
+
+      {!collapsed && (
+        <>
+          <div className="legend__body">
+            <div className="legend__title">{layer.title}</div>
+            <div className="legend__desc">{layer.desc}</div>
+
+            {layer.items ? (
+              <div className="legend__items">
+                {layer.items.map(({ name, color }) => (
+                  <div className="legend__item" key={name}>
+                    <span className="legend__swatch" style={{ background: color }} />
+                    {name}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div>
+                <div className="legend__gradient" />
+                <div className="legend__gradient-labels">
+                  <span>fewer</span>
+                  <span>many</span>
+                </div>
+                <div className="legend__items" style={{ marginTop: 10 }}>
+                  <div className="legend__item">
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#a9c6d8' }} />
+                    Lower diversity
+                  </div>
+                  <div className="legend__item">
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#d9a05b' }} />
+                    Medium diversity
+                  </div>
+                  <div className="legend__item">
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#a23a3a' }} />
+                    High diversity
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <button
+            className={`legend__stack ${stacked ? 'legend__stack--on' : ''}`}
+            onClick={() => onStackedChange(!stacked)}
+            aria-pressed={stacked}
+          >
+            <span className="legend__stack-switch" />
+            <Icon name="layers" size={14} />
+            <span>Stack all layers</span>
+          </button>
+        </>
+      )}
+    </aside>
   )
 }
 

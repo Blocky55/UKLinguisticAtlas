@@ -1,147 +1,127 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import Icon from './Icons'
 
 const ALL_REGIONS = [
-  { name: 'Belfast', layer: 'diversity', center: [-5.93, 54.60] },
-  { name: 'Birmingham', layer: 'diversity', center: [-1.89, 52.49] },
-  { name: 'Bristol', layer: 'diversity', center: [-2.59, 51.45] },
-  { name: 'Cardiff', layer: 'diversity', center: [-3.18, 51.48] },
-  { name: 'Cockney', layer: 'dialects', center: [-0.12, 51.51] },
-  { name: 'Cornish', layer: 'languages', center: [-5.0, 50.3] },
-  { name: 'Geordie', layer: 'dialects', center: [-1.61, 54.97] },
-  { name: 'Glasgow', layer: 'diversity', center: [-4.25, 55.86] },
-  { name: 'Irish', layer: 'languages', center: [-8.0, 53.0] },
-  { name: 'Leeds', layer: 'diversity', center: [-1.55, 53.80] },
-  { name: 'London', layer: 'diversity', center: [-0.12, 51.51] },
-  { name: 'Manchester', layer: 'diversity', center: [-2.24, 53.48] },
-  { name: 'Mancunian', layer: 'dialects', center: [-2.24, 53.48] },
-  { name: 'Scottish Gaelic', layer: 'languages', center: [-6.0, 57.5] },
-  { name: 'Scots', layer: 'languages', center: [-3.5, 56.0] },
-  { name: 'Scouse', layer: 'dialects', center: [-2.98, 53.41] },
-  { name: 'Welsh', layer: 'languages', center: [-3.8, 52.4] },
-  { name: 'Welsh English', layer: 'dialects', center: [-3.8, 52.4] },
+  { name: 'Belfast',          layer: 'diversity', center: [-5.93, 54.60], color: '#a9c6d8' },
+  { name: 'Birmingham',       layer: 'diversity', center: [-1.89, 52.49], color: '#d9a05b' },
+  { name: 'Bristol',          layer: 'diversity', center: [-2.59, 51.45], color: '#d9a05b' },
+  { name: 'Cardiff',          layer: 'diversity', center: [-3.18, 51.48], color: '#a9c6d8' },
+  { name: 'Cockney',          layer: 'dialects',  center: [-0.12, 51.51], color: '#6a4d80' },
+  { name: 'Cornish',          layer: 'languages', center: [-5.00, 50.30], color: '#b8943a' },
+  { name: 'Geordie',          layer: 'dialects',  center: [-1.61, 54.97], color: '#c4622d' },
+  { name: 'Glasgow',          layer: 'diversity', center: [-4.25, 55.86], color: '#a9c6d8' },
+  { name: 'Irish',            layer: 'languages', center: [-8.00, 53.00], color: '#5d8a64' },
+  { name: 'Leeds',            layer: 'diversity', center: [-1.55, 53.80], color: '#d9a05b' },
+  { name: 'London',           layer: 'diversity', center: [-0.12, 51.51], color: '#a23a3a' },
+  { name: 'Manchester',       layer: 'diversity', center: [-2.24, 53.48], color: '#d9a05b' },
+  { name: 'Mancunian',        layer: 'dialects',  center: [-2.24, 53.48], color: '#2c6e7a' },
+  { name: 'Scottish Gaelic',  layer: 'languages', center: [-6.00, 57.50], color: '#4a6fa0' },
+  { name: 'Scots',            layer: 'languages', center: [-3.50, 56.00], color: '#6b9c70' },
+  { name: 'Scouse',           layer: 'dialects',  center: [-2.98, 53.41], color: '#c89b3c' },
+  { name: 'Welsh',            layer: 'languages', center: [-3.80, 52.40], color: '#2e7d8f' },
+  { name: 'Welsh English',    layer: 'dialects',  center: [-3.80, 52.40], color: '#a23a3a' },
 ]
 
-const ResultsList = ({ items, onSelect }) => (
-  <div style={{
-    marginTop: '6px',
-    background: 'rgba(13,27,42,0.97)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    borderRadius: '8px',
-    overflow: 'hidden',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
-    maxHeight: '320px',
-    overflowY: 'auto',
-  }}>
-    {items.map(region => (
-      <div
-        key={region.name + region.layer}
-        onMouseDown={() => onSelect(region)}
-        style={{
-          padding: '10px 16px',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          borderBottom: '1px solid rgba(255,255,255,0.05)',
-          transition: '0.15s ease',
-        }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(56,217,169,0.1)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-      >
-        <span style={{ color: '#e8f4fd', fontSize: '14px', fontFamily: 'var(--font)' }}>
-          {region.name}
-        </span>
-        <span style={{ color: '#5e7d90', fontSize: '11px', fontFamily: 'var(--font)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          {region.layer}
-        </span>
-      </div>
-    ))}
-  </div>
-)
-
-const SearchBar = ({ onSelect }) => {
+const SearchBar = ({ onSelect, registerFocus }) => {
   const [query, setQuery] = useState('')
   const [focused, setFocused] = useState(false)
+  const [activeIdx, setActiveIdx] = useState(0)
+  const inputRef = useRef(null)
+  const listRef = useRef(null)
+
+  useEffect(() => {
+    if (registerFocus) registerFocus(() => inputRef.current?.focus())
+  }, [registerFocus])
 
   const results = query.length >= 1
-    ? ALL_REGIONS.filter(r =>
-        r.name.toLowerCase().startsWith(query.toLowerCase())
-      )
+    ? ALL_REGIONS.filter(r => r.name.toLowerCase().includes(query.toLowerCase()))
     : ALL_REGIONS
 
-  const showDropdown = focused
+  useEffect(() => { setActiveIdx(0) }, [query])
+
+  useEffect(() => {
+    if (!focused) return
+    const el = listRef.current?.querySelector(`[data-idx="${activeIdx}"]`)
+    if (el) el.scrollIntoView({ block: 'nearest' })
+  }, [activeIdx, focused])
 
   const handleSelect = (region) => {
     onSelect(region)
     setQuery('')
     setFocused(false)
+    inputRef.current?.blur()
+  }
+
+  const handleKey = (e) => {
+    if (!focused) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setActiveIdx(i => Math.min(i + 1, results.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setActiveIdx(i => Math.max(i - 1, 0))
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      if (results[activeIdx]) handleSelect(results[activeIdx])
+    } else if (e.key === 'Escape') {
+      setFocused(false)
+      inputRef.current?.blur()
+    }
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: '24px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      zIndex: 1000,
-      width: '300px',
-    }}>
-      <input
-        type="text"
-        placeholder="Search regions, languages, cities..."
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => setTimeout(() => setFocused(false), 150)}
-        style={{
-          width: '100%',
-          padding: '10px 16px',
-          borderRadius: '8px',
-          border: '1px solid rgba(255,255,255,0.12)',
-          background: 'rgba(13,27,42,0.92)',
-          color: '#e8f4fd',
-          fontSize: '14px',
-          fontFamily: 'var(--font)',
-          outline: 'none',
-          backdropFilter: 'blur(8px)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
-        }}
-      />
+    <div className="topbar">
+      <div className="search">
+        <span className="search__icon"><Icon name="search" size={14} /></span>
+        <input
+          ref={inputRef}
+          type="text"
+          className="search__input"
+          placeholder="Search regions, languages, cities…"
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setTimeout(() => setFocused(false), 150)}
+          onKeyDown={handleKey}
+          aria-label="Search regions, languages, and cities"
+          autoComplete="off"
+        />
+        {query.length > 0 && (
+          <button
+            className="search__clear"
+            onMouseDown={(e) => { e.preventDefault(); setQuery(''); inputRef.current?.focus() }}
+            aria-label="Clear search"
+          >
+            <Icon name="close" size={14} />
+          </button>
+        )}
 
-      {showDropdown && (
-        <>
-          {query.length === 0 && (
-            <div style={{
-              marginTop: '6px',
-              padding: '8px 16px',
-              color: '#5e7d90',
-              fontSize: '11px',
-              fontFamily: 'var(--font)',
-              letterSpacing: '0.06em',
-              textTransform: 'uppercase',
-            }}>
-              All locations — alphabetical
-            </div>
-          )}
-          {results.length > 0
-            ? <ResultsList items={results} onSelect={handleSelect} />
-            : (
-              <div style={{
-                marginTop: '6px',
-                padding: '12px 16px',
-                background: 'rgba(13,27,42,0.97)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '8px',
-                color: '#5e7d90',
-                fontSize: '13px',
-                fontFamily: 'var(--font)',
-              }}>
-                No results found
+        {focused && (
+          <div className="search__results" ref={listRef}>
+            {query.length === 0 && (
+              <div className="search__hint">All entries — alphabetical</div>
+            )}
+            {results.length === 0 && (
+              <div className="search__empty">No matching entries</div>
+            )}
+            {results.map((region, i) => (
+              <div
+                key={region.name + region.layer}
+                data-idx={i}
+                onMouseDown={() => handleSelect(region)}
+                onMouseEnter={() => setActiveIdx(i)}
+                className={`search__item ${i === activeIdx ? 'search__item--active' : ''}`}
+              >
+                <span className="search__item-name">
+                  <span className="search__item-swatch" style={{ background: region.color }} />
+                  {region.name}
+                </span>
+                <span className="search__item-layer">{region.layer}</span>
               </div>
-            )
-          }
-        </>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

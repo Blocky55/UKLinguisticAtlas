@@ -4,11 +4,45 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
-const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
+// Refined, editorial categorical palettes — mirrored in CSS for the legend.
+const DIALECT_COLORS = [
+  'match', ['get', 'name'],
+  'Mancunian',     '#2c6e7a',
+  'Scouse',        '#c89b3c',
+  'Welsh English', '#a23a3a',
+  'Cockney',       '#6a4d80',
+  'Geordie',       '#c4622d',
+  '#8a857e',
+]
+
+const LANGUAGE_COLORS = [
+  'match', ['get', 'name'],
+  'Welsh',           '#2e7d8f',
+  'Scottish Gaelic', '#4a6fa0',
+  'Irish',           '#5d8a64',
+  'Scots',           '#6b9c70',
+  'Cornish',         '#b8943a',
+  '#8a857e',
+]
+
+const Map = ({
+  onRegionClick,
+  onTooltipChange,
+  activeLayer,
+  stacked,
+  mapRef,
+  sidebarOpen,
+  isMobile,
+}) => {
   const container = useRef(null)
   const map = useRef(null)
-  const hoveredId = useRef(null)
+  const hoveredId = useRef({ source: null, id: null })
   const loaded = useRef(false)
+  const sidebarOpenRef = useRef(sidebarOpen)
+  const isMobileRef = useRef(isMobile)
+
+  useEffect(() => { sidebarOpenRef.current = sidebarOpen }, [sidebarOpen])
+  useEffect(() => { isMobileRef.current = isMobile }, [isMobile])
 
   useEffect(() => {
     if (map.current) return
@@ -16,15 +50,28 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
 
     const m = new mapboxgl.Map({
       container: container.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-2.5, 54.5],
+      style: 'mapbox://styles/mapbox/light-v11',
+      center: [-3.5, 54.6],
       zoom: 5,
       minZoom: 4,
       maxZoom: 12,
+      attributionControl: false,
+      pitchWithRotate: false,
+      dragRotate: false,
+      touchPitch: false,
     })
+
+    m.addControl(new mapboxgl.AttributionControl({ compact: true }), 'top-right')
 
     m.on('load', () => {
       loaded.current = true
+
+      // Soften the map style — desaturate water and labels for editorial feel
+      try {
+        if (m.getLayer('water')) {
+          m.setPaintProperty('water', 'fill-color', '#e6e1d4')
+        }
+      } catch {}
 
       // ── Dialects ──
       m.addSource('dialects', {
@@ -38,19 +85,12 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         type: 'fill',
         source: 'dialects',
         paint: {
-          'fill-color': [
-            'match', ['get', 'name'],
-            'Mancunian',    '#38d9a9',
-            'Scouse',       '#ffd43b',
-            'Welsh English','#e03131',
-            'Cockney',      '#7950f2',
-            'Geordie',      '#f76707',
-            '#888888'
-          ],
+          'fill-color': DIALECT_COLORS,
           'fill-opacity': [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
-            0.8, 0.5
+            0.72,
+            0.50,
           ],
         },
       })
@@ -60,9 +100,12 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         type: 'line',
         source: 'dialects',
         paint: {
-          'line-color': '#ffffff',
-          'line-width': 1.5,
-          'line-opacity': 0.4,
+          'line-color': DIALECT_COLORS,
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 2.2, 1.2,
+          ],
+          'line-opacity': 0.85,
         },
       })
 
@@ -79,19 +122,12 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         source: 'languages',
         layout: { visibility: 'none' },
         paint: {
-          'fill-color': [
-            'match', ['get', 'name'],
-            'Welsh',           '#4ecdc4',
-            'Scottish Gaelic', '#45b7d1',
-            'Irish',           '#96ceb4',
-            'Scots',           '#88d8a3',
-            'Cornish',         '#ffd93d',
-            '#888888'
-          ],
+          'fill-color': LANGUAGE_COLORS,
           'fill-opacity': [
             'case',
             ['boolean', ['feature-state', 'hover'], false],
-            0.8, 0.5
+            0.65,
+            0.42,
           ],
         },
       })
@@ -102,9 +138,12 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         source: 'languages',
         layout: { visibility: 'none' },
         paint: {
-          'line-color': '#ffffff',
-          'line-width': 1.5,
-          'line-opacity': 0.4,
+          'line-color': LANGUAGE_COLORS,
+          'line-width': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false], 2, 1.0,
+          ],
+          'line-opacity': 0.75,
         },
       })
 
@@ -123,18 +162,23 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['get', 'diversity_score'],
-            28, 12,
-            95, 40,
+            28, 10,
+            95, 34,
           ],
           'circle-color': [
             'interpolate', ['linear'], ['get', 'diversity_score'],
-            28, '#45b7d1',
-            60, '#ffd43b',
-            95, '#e03131',
+            28, '#a9c6d8',
+            60, '#d9a05b',
+            95, '#a23a3a',
           ],
-          'circle-opacity': 0.75,
-          'circle-stroke-color': '#ffffff',
-          'circle-stroke-width': 1.5,
+          'circle-opacity': [
+            'case',
+            ['boolean', ['feature-state', 'hover'], false],
+            0.92, 0.78,
+          ],
+          'circle-stroke-color': '#1a1817',
+          'circle-stroke-width': 1.2,
+          'circle-stroke-opacity': 0.55,
         },
       })
 
@@ -145,80 +189,102 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
         layout: {
           visibility: 'none',
           'text-field': ['get', 'name'],
-          'text-size': 12,
-          'text-offset': [0, 2.5],
+          'text-size': 11,
+          'text-offset': [0, 1.9],
           'text-anchor': 'top',
+          'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          'text-letter-spacing': 0.04,
         },
         paint: {
-          'text-color': '#e8f4fd',
-          'text-halo-color': '#0d1b2a',
-          'text-halo-width': 1,
+          'text-color': '#1a1817',
+          'text-halo-color': '#f8f5ee',
+          'text-halo-width': 1.4,
         },
       })
 
-      // ── Hover (dialects) ──
-      m.on('mousemove', 'dialects-fill', (e) => {
-        if (!e.features.length) return
-        if (hoveredId.current !== null) {
-          m.setFeatureState({ source: 'dialects', id: hoveredId.current }, { hover: false })
-        }
-        hoveredId.current = e.features[0].id
-        m.setFeatureState({ source: 'dialects', id: hoveredId.current }, { hover: true })
-        m.getCanvas().style.cursor = 'pointer'
-        onTooltipChange({ visible: true, x: e.point.x, y: e.point.y, text: e.features[0].properties.name })
-      })
+      // ── Hover helpers ──
+      const setHover = (source, id, state) => {
+        if (id == null) return
+        m.setFeatureState({ source, id }, { hover: state })
+      }
 
-      m.on('mouseleave', 'dialects-fill', () => {
-        if (hoveredId.current !== null) {
-          m.setFeatureState({ source: 'dialects', id: hoveredId.current }, { hover: false })
-        }
-        hoveredId.current = null
-        m.getCanvas().style.cursor = ''
-        onTooltipChange({ visible: false })
-      })
-
-      // ── Hover (languages) ──
-      m.on('mousemove', 'languages-fill', (e) => {
-        if (!e.features.length) return
-        if (hoveredId.current !== null) {
-          m.setFeatureState({ source: 'languages', id: hoveredId.current }, { hover: false })
-        }
-        hoveredId.current = e.features[0].id
-        m.setFeatureState({ source: 'languages', id: hoveredId.current }, { hover: true })
-        m.getCanvas().style.cursor = 'pointer'
-        onTooltipChange({ visible: true, x: e.point.x, y: e.point.y, text: e.features[0].properties.name })
-      })
-
-      m.on('mouseleave', 'languages-fill', () => {
-        if (hoveredId.current !== null) {
-          m.setFeatureState({ source: 'languages', id: hoveredId.current }, { hover: false })
-        }
-        hoveredId.current = null
-        m.getCanvas().style.cursor = ''
-        onTooltipChange({ visible: false })
-      })
-
-      // ── Hover (diversity) ──
-      m.on('mousemove', 'diversity-circles', (e) => {
-        if (!e.features.length) return
-        m.getCanvas().style.cursor = 'pointer'
-        onTooltipChange({
-          visible: true,
-          x: e.point.x,
-          y: e.point.y,
-          text: `${e.features[0].properties.name} — ${e.features[0].properties.languages} languages`,
+      const wireHover = (layerId, source, getText) => {
+        m.on('mousemove', layerId, (e) => {
+          if (!e.features.length) return
+          if (hoveredId.current.id !== null) {
+            setHover(hoveredId.current.source, hoveredId.current.id, false)
+          }
+          hoveredId.current = { source, id: e.features[0].id }
+          setHover(source, e.features[0].id, true)
+          m.getCanvas().style.cursor = 'pointer'
+          if (!isMobileRef.current) {
+            onTooltipChange({
+              visible: true,
+              x: e.point.x,
+              y: e.point.y,
+              text: getText(e.features[0].properties),
+            })
+          }
         })
-      })
 
-      m.on('mouseleave', 'diversity-circles', () => {
-        m.getCanvas().style.cursor = ''
-        onTooltipChange({ visible: false })
-      })
+        m.on('mouseleave', layerId, () => {
+          if (hoveredId.current.id !== null) {
+            setHover(hoveredId.current.source, hoveredId.current.id, false)
+          }
+          hoveredId.current = { source: null, id: null }
+          m.getCanvas().style.cursor = ''
+          onTooltipChange({ visible: false })
+        })
+      }
+
+      wireHover('dialects-fill',     'dialects',  (p) => p.name)
+      wireHover('languages-fill',    'languages', (p) => p.name)
+      wireHover('diversity-circles', 'diversity', (p) => `${p.name} — ${p.languages}+ languages`)
 
       // ── Click ──
+      const computePadding = () => {
+        const open = sidebarOpenRef.current
+        const mobile = isMobileRef.current
+        if (mobile) {
+          return open
+            ? { top: 60, right: 20, bottom: window.innerHeight * 0.72 + 30, left: 20 }
+            : { top: 80, right: 20, bottom: 120, left: 20 }
+        }
+        return open
+          ? { top: 80, right: 380 + 40, bottom: 80, left: 60 }
+          : { top: 80, right: 60, bottom: 80, left: 60 }
+      }
+
+      const computeOffset = () => {
+        if (isMobileRef.current) {
+          return sidebarOpenRef.current ? [0, -window.innerHeight * 0.18] : [0, 0]
+        }
+        return sidebarOpenRef.current ? [-190, 0] : [0, 0]
+      }
+
+      const featureBounds = (feature) => {
+        const bounds = new mapboxgl.LngLatBounds()
+        const addCoords = (coords) => {
+          if (typeof coords[0] === 'number') {
+            bounds.extend(coords)
+          } else {
+            coords.forEach(addCoords)
+          }
+        }
+        addCoords(feature.geometry.coordinates)
+        return bounds
+      }
+
       const handleClick = (e) => {
         if (!e.features.length) return
-        const props = e.features[0].properties
+        const feat = e.features[0]
+        const props = feat.properties
+        const layer = feat.layer.id.startsWith('dialects')
+          ? 'dialects'
+          : feat.layer.id.startsWith('languages')
+            ? 'languages'
+            : 'diversity'
+
         onRegionClick({
           name: props.name,
           region: props.region,
@@ -227,8 +293,32 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
           diversity_score: props.diversity_score || null,
           fact: props.fact,
           status: props.status || null,
+          layer,
+          center: feat.geometry.type === 'Point'
+            ? feat.geometry.coordinates
+            : [e.lngLat.lng, e.lngLat.lat],
         })
-        m.flyTo({ center: [e.lngLat.lng, e.lngLat.lat], zoom: 7, duration: 1400 })
+
+        // Wait one tick for the sidebar to mount before fitting bounds.
+        setTimeout(() => {
+          if (feat.geometry.type === 'Point') {
+            m.flyTo({
+              center: feat.geometry.coordinates,
+              zoom: 8,
+              duration: 1100,
+              offset: computeOffset(),
+              essential: true,
+            })
+          } else {
+            const b = featureBounds(feat)
+            m.fitBounds(b, {
+              padding: computePadding(),
+              duration: 1100,
+              maxZoom: 9,
+              essential: true,
+            })
+          }
+        }, 50)
       }
 
       m.on('click', 'dialects-fill', handleClick)
@@ -238,18 +328,46 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
 
     map.current = m
     if (mapRef) mapRef.current = m
+    if (typeof window !== 'undefined' && import.meta.env.DEV) window.__atlas_map = m
+
+    return () => {
+      if (map.current) {
+        map.current.remove()
+        map.current = null
+      }
+    }
   }, [])
 
   // ── Layer switching ──
   useEffect(() => {
-    if (!loaded.current) return
-
-    const allLayers = [
+    if (!loaded.current || !map.current) return
+    const all = [
       'dialects-fill', 'dialects-outline',
       'languages-fill', 'languages-outline',
       'diversity-circles', 'diversity-labels',
     ]
-    allLayers.forEach(l => map.current.setLayoutProperty(l, 'visibility', 'none'))
+
+    if (stacked) {
+      all.forEach(l => map.current.setLayoutProperty(l, 'visibility', 'visible'))
+      // Lighter fills when stacked so layers don't muddy
+      map.current.setPaintProperty('dialects-fill', 'fill-opacity', [
+        'case', ['boolean', ['feature-state', 'hover'], false], 0.55, 0.32,
+      ])
+      map.current.setPaintProperty('languages-fill', 'fill-opacity', [
+        'case', ['boolean', ['feature-state', 'hover'], false], 0.5, 0.28,
+      ])
+      return
+    }
+
+    all.forEach(l => map.current.setLayoutProperty(l, 'visibility', 'none'))
+
+    // Restore default fill opacities
+    map.current.setPaintProperty('dialects-fill', 'fill-opacity', [
+      'case', ['boolean', ['feature-state', 'hover'], false], 0.72, 0.50,
+    ])
+    map.current.setPaintProperty('languages-fill', 'fill-opacity', [
+      'case', ['boolean', ['feature-state', 'hover'], false], 0.65, 0.42,
+    ])
 
     if (activeLayer === 'dialects') {
       map.current.setLayoutProperty('dialects-fill', 'visibility', 'visible')
@@ -261,9 +379,9 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
       map.current.setLayoutProperty('diversity-circles', 'visibility', 'visible')
       map.current.setLayoutProperty('diversity-labels', 'visibility', 'visible')
     }
-  }, [activeLayer])
+  }, [activeLayer, stacked])
 
-  return <div ref={container} style={{ width: '100%', height: '100%' }} />
+  return <div className="map-host"><div ref={container} /></div>
 }
 
 export default Map
