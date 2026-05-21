@@ -4,7 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
-const Map = ({ onRegionClick, onTooltipChange, activeLayer }) => {
+const Map = ({ onRegionClick, onTooltipChange, activeLayer, mapRef }) => {
   const container = useRef(null)
   const map = useRef(null)
   const hoveredId = useRef(null)
@@ -237,6 +237,7 @@ const Map = ({ onRegionClick, onTooltipChange, activeLayer }) => {
     })
 
     map.current = m
+    if (mapRef) mapRef.current = m
   }, [])
 
   // ── Layer switching ──
