@@ -6,6 +6,7 @@ import SearchBar from './components/SearchBar'
 import Sidebar from './components/Sidebar'
 import Icon from './components/Icons'
 import { AboutModal, ShortcutsModal } from './components/Modal'
+import { TOTALS } from './data/regions'
 import './styles/globals.css'
 
 const OVERVIEW = { center: [-3.5, 54.6], zoom: 5 }
@@ -161,7 +162,6 @@ const App = () => {
     localStorage.setItem('la_hint_dismissed', '1')
   }
 
-  const totals = { dialects: 5, languages: 5, cities: 8 }
   const bookmarkKey = selectedRegion ? `${selectedRegion.name}|${selectedRegion.layer}` : null
   const isBookmarked = bookmarkKey ? bookmarks.includes(bookmarkKey) : false
 
@@ -240,15 +240,15 @@ const App = () => {
       {/* Stats strip (desktop only) */}
       <div className="stats" aria-label="At-a-glance totals">
         <div className="stats__cell">
-          <div className="stats__num">{totals.dialects}</div>
+          <div className="stats__num">{TOTALS.dialects}</div>
           <div className="stats__lbl">Dialects</div>
         </div>
         <div className="stats__cell">
-          <div className="stats__num">{totals.languages}</div>
+          <div className="stats__num">{TOTALS.languages}</div>
           <div className="stats__lbl">Languages</div>
         </div>
         <div className="stats__cell">
-          <div className="stats__num">{totals.cities}</div>
+          <div className="stats__num">{TOTALS.cities}</div>
           <div className="stats__lbl">Cities</div>
         </div>
       </div>
@@ -300,7 +300,7 @@ const App = () => {
 
       {/* Modals */}
       <AnimatePresence>
-        {showAbout && <AboutModal totals={totals} onClose={() => setShowAbout(false)} />}
+        {showAbout && <AboutModal totals={TOTALS} onClose={() => setShowAbout(false)} />}
         {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
       </AnimatePresence>
 

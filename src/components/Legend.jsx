@@ -1,48 +1,6 @@
 import { useState } from 'react'
 import Icon from './Icons'
-
-const DIALECTS = [
-  { name: 'Mancunian',     color: '#2c6e7a' },
-  { name: 'Scouse',        color: '#c89b3c' },
-  { name: 'Welsh English', color: '#a23a3a' },
-  { name: 'Cockney',       color: '#6a4d80' },
-  { name: 'Geordie',       color: '#c4622d' },
-]
-
-const LANGUAGES = [
-  { name: 'Welsh',           color: '#2e7d8f' },
-  { name: 'Scottish Gaelic', color: '#4a6fa0' },
-  { name: 'Irish',           color: '#5d8a64' },
-  { name: 'Scots',           color: '#6b9c70' },
-  { name: 'Cornish',         color: '#b8943a' },
-]
-
-const LAYERS = [
-  {
-    id: 'dialects',
-    label: 'Dialects',
-    iconName: 'quote',
-    title: 'Dialect Regions',
-    desc: 'Spoken varieties of English. Hover or tap a region to see characteristic phrases.',
-    items: DIALECTS,
-  },
-  {
-    id: 'languages',
-    label: 'Languages',
-    iconName: 'languages',
-    title: 'Indigenous Languages',
-    desc: 'Celtic and historic languages of the British Isles, including UNESCO-classified endangered tongues.',
-    items: LANGUAGES,
-  },
-  {
-    id: 'diversity',
-    label: 'Diversity',
-    iconName: 'globe',
-    title: 'Linguistic Diversity',
-    desc: 'Number of languages spoken in major cities, scaled 0–100 by community count.',
-    items: null,
-  },
-]
+import { LAYERS, DIVERSITY_BANDS } from '../data/regions'
 
 const Legend = ({ activeLayer, onLayerChange, stacked, onStackedChange }) => {
   const [collapsed, setCollapsed] = useState(() =>
@@ -102,15 +60,15 @@ const Legend = ({ activeLayer, onLayerChange, stacked, onStackedChange }) => {
                 </div>
                 <div className="legend__items" style={{ marginTop: 10 }}>
                   <div className="legend__item">
-                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#a9c6d8' }} />
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: DIVERSITY_BANDS.low }} />
                     Lower diversity
                   </div>
                   <div className="legend__item">
-                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#d9a05b' }} />
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: DIVERSITY_BANDS.mid }} />
                     Medium diversity
                   </div>
                   <div className="legend__item">
-                    <span className="legend__swatch legend__swatch--circle" style={{ background: '#a23a3a' }} />
+                    <span className="legend__swatch legend__swatch--circle" style={{ background: DIVERSITY_BANDS.high }} />
                     High diversity
                   </div>
                 </div>

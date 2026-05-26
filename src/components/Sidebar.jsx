@@ -2,25 +2,11 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Icon from './Icons'
 import { PHRASES, CITY_LANGUAGES } from '../data/phrases'
+import { LAYERS, COLOR_BY_NAME } from '../data/regions'
 
-const LAYER_LABELS = {
-  dialects:  { label: 'Dialect',   color: '#a23a3a' },
-  languages: { label: 'Language',  color: '#2e7d8f' },
-  diversity: { label: 'City',      color: '#b07a2c' },
-}
-
-const COLOR_BY_NAME = {
-  'Mancunian':       '#2c6e7a',
-  'Scouse':          '#c89b3c',
-  'Welsh English':   '#a23a3a',
-  'Cockney':         '#6a4d80',
-  'Geordie':         '#c4622d',
-  'Welsh':           '#2e7d8f',
-  'Scottish Gaelic': '#4a6fa0',
-  'Irish':           '#5d8a64',
-  'Scots':           '#6b9c70',
-  'Cornish':         '#b8943a',
-}
+const LAYER_LABELS = Object.fromEntries(
+  LAYERS.map(l => [l.id, { label: l.displayLabel, color: l.accent }])
+)
 
 const speak = (text, lang) => {
   if (!('speechSynthesis' in window)) return false

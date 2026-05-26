@@ -1,26 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Icon from './Icons'
-
-const ALL_REGIONS = [
-  { name: 'Belfast',          layer: 'diversity', center: [-5.93, 54.60], color: '#a9c6d8' },
-  { name: 'Birmingham',       layer: 'diversity', center: [-1.89, 52.49], color: '#d9a05b' },
-  { name: 'Bristol',          layer: 'diversity', center: [-2.59, 51.45], color: '#d9a05b' },
-  { name: 'Cardiff',          layer: 'diversity', center: [-3.18, 51.48], color: '#a9c6d8' },
-  { name: 'Cockney',          layer: 'dialects',  center: [-0.12, 51.51], color: '#6a4d80' },
-  { name: 'Cornish',          layer: 'languages', center: [-5.00, 50.30], color: '#b8943a' },
-  { name: 'Geordie',          layer: 'dialects',  center: [-1.61, 54.97], color: '#c4622d' },
-  { name: 'Glasgow',          layer: 'diversity', center: [-4.25, 55.86], color: '#a9c6d8' },
-  { name: 'Irish',            layer: 'languages', center: [-8.00, 53.00], color: '#5d8a64' },
-  { name: 'Leeds',            layer: 'diversity', center: [-1.55, 53.80], color: '#d9a05b' },
-  { name: 'London',           layer: 'diversity', center: [-0.12, 51.51], color: '#a23a3a' },
-  { name: 'Manchester',       layer: 'diversity', center: [-2.24, 53.48], color: '#d9a05b' },
-  { name: 'Mancunian',        layer: 'dialects',  center: [-2.24, 53.48], color: '#2c6e7a' },
-  { name: 'Scottish Gaelic',  layer: 'languages', center: [-6.00, 57.50], color: '#4a6fa0' },
-  { name: 'Scots',            layer: 'languages', center: [-3.50, 56.00], color: '#6b9c70' },
-  { name: 'Scouse',           layer: 'dialects',  center: [-2.98, 53.41], color: '#c89b3c' },
-  { name: 'Welsh',            layer: 'languages', center: [-3.80, 52.40], color: '#2e7d8f' },
-  { name: 'Welsh English',    layer: 'dialects',  center: [-3.80, 52.40], color: '#a23a3a' },
-]
+import { ALL_REGIONS } from '../data/regions'
 
 const SearchBar = ({ onSelect, registerFocus }) => {
   const [query, setQuery] = useState('')

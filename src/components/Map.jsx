@@ -1,29 +1,9 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { DIALECT_COLORS, LANGUAGE_COLORS, DIVERSITY_BANDS } from '../data/regions'
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
-
-// Refined, editorial categorical palettes — mirrored in CSS for the legend.
-const DIALECT_COLORS = [
-  'match', ['get', 'name'],
-  'Mancunian',     '#2c6e7a',
-  'Scouse',        '#c89b3c',
-  'Welsh English', '#a23a3a',
-  'Cockney',       '#6a4d80',
-  'Geordie',       '#c4622d',
-  '#8a857e',
-]
-
-const LANGUAGE_COLORS = [
-  'match', ['get', 'name'],
-  'Welsh',           '#2e7d8f',
-  'Scottish Gaelic', '#4a6fa0',
-  'Irish',           '#5d8a64',
-  'Scots',           '#6b9c70',
-  'Cornish',         '#b8943a',
-  '#8a857e',
-]
 
 const Map = ({
   onRegionClick,
@@ -71,7 +51,9 @@ const Map = ({
         if (m.getLayer('water')) {
           m.setPaintProperty('water', 'fill-color', '#e6e1d4')
         }
-      } catch {}
+      } catch {
+        // Style layer not present on this Mapbox style — safe to ignore.
+      }
 
       // ── Dialects ──
       m.addSource('dialects', {
@@ -167,9 +149,9 @@ const Map = ({
           ],
           'circle-color': [
             'interpolate', ['linear'], ['get', 'diversity_score'],
-            28, '#a9c6d8',
-            60, '#d9a05b',
-            95, '#a23a3a',
+            28, DIVERSITY_BANDS.low,
+            60, DIVERSITY_BANDS.mid,
+            95, DIVERSITY_BANDS.high,
           ],
           'circle-opacity': [
             'case',
