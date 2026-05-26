@@ -73,6 +73,12 @@ html, body, #root { height: 100%; width: 100%; }
 
   --sidebar-w: 380px;
 
+  /* Safe-area shorthands — fall back to 0 on browsers without env() */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+
   font-family: var(--sans);
   color: var(--ink);
   background: var(--paper);
@@ -109,16 +115,39 @@ a:hover { text-decoration: underline; }
 .map-host { position: absolute; inset: 0; }
 .map-host > div { width: 100%; height: 100%; }
 
-/* Soften the default mapbox attribution */
-.mapboxgl-ctrl-bottom-right { display: none !important; }
+/* Keep Mapbox attribution visible (per licence) but discreet — sit it
+   in the bottom-right corner with safe-area padding. The bottom-left
+   stripe (Mapbox/OSM logos) stays hidden to keep the map clean. */
 .mapboxgl-ctrl-bottom-left  { display: none !important; }
+.mapboxgl-ctrl-bottom-right {
+  bottom: calc(var(--sab) + 6px) !important;
+  right: calc(var(--sar) + 6px) !important;
+  z-index: 10;
+}
+.mapboxgl-ctrl-attrib.mapboxgl-compact {
+  background: var(--paper-card);
+  border: 1px solid var(--rule-strong);
+  box-shadow: var(--shadow-1);
+  border-radius: var(--r-pill);
+  min-width: 26px;
+  min-height: 26px;
+}
+.mapboxgl-ctrl-attrib.mapboxgl-compact-show {
+  padding-right: 26px;
+}
+.mapboxgl-ctrl-attrib-inner {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+.mapboxgl-ctrl-attrib-inner a { color: var(--ink-2); }
 
 /* ─── Masthead (top-left brand) ─────────────────────────────── */
 
 .masthead {
   position: fixed;
-  top: 22px;
-  left: 28px;
+  top: calc(var(--sat) + 22px);
+  left: calc(var(--sal) + 28px);
   z-index: 30;
   pointer-events: none;
   user-select: none;
@@ -166,7 +195,7 @@ a:hover { text-decoration: underline; }
 
 .topbar {
   position: fixed;
-  top: 22px;
+  top: calc(var(--sat) + 22px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 30;
@@ -303,8 +332,8 @@ a:hover { text-decoration: underline; }
 
 .controls {
   position: fixed;
-  top: 22px;
-  right: 28px;
+  top: calc(var(--sat) + 22px);
+  right: calc(var(--sar) + 28px);
   z-index: 30;
   display: flex;
   gap: 6px;
@@ -379,8 +408,8 @@ a:hover { text-decoration: underline; }
 
 .legend {
   position: fixed;
-  bottom: 24px;
-  left: 28px;
+  bottom: calc(var(--sab) + 24px);
+  left: calc(var(--sal) + 28px);
   z-index: 25;
   width: 268px;
   background: var(--paper-card);
@@ -865,8 +894,8 @@ a:hover { text-decoration: underline; }
 
 .stats {
   position: fixed;
-  bottom: 24px;
-  right: 28px;
+  bottom: calc(var(--sab) + 24px);
+  right: calc(var(--sar) + 28px);
   z-index: 25;
   display: flex;
   align-items: stretch;
@@ -912,7 +941,11 @@ a:hover { text-decoration: underline; }
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding:
+    calc(var(--sat) + 20px)
+    calc(var(--sar) + 20px)
+    calc(var(--sab) + 20px)
+    calc(var(--sal) + 20px);
 }
 
 .modal {
@@ -1039,7 +1072,7 @@ a:hover { text-decoration: underline; }
 .hint {
   position: fixed;
   left: 50%;
-  bottom: 80px;
+  bottom: calc(var(--sab) + 80px);
   transform: translateX(-50%);
   z-index: 20;
   background: var(--ink);
@@ -1069,7 +1102,7 @@ a:hover { text-decoration: underline; }
 .toast {
   position: fixed;
   left: 50%;
-  bottom: 80px;
+  bottom: calc(var(--sab) + 80px);
   transform: translateX(-50%);
   z-index: 70;
   background: var(--ink);
@@ -1105,106 +1138,247 @@ a:hover { text-decoration: underline; }
 /* ─── Responsive ─ tablet ───────────────────────────────────── */
 
 @media (max-width: 1024px) {
-  .masthead { top: 18px; left: 22px; }
-  .masthead__title { font-size: 22px; }
-  .controls { top: 18px; right: 22px; }
-  .topbar { width: min(360px, calc(100% - 220px)); }
-  .legend { left: 22px; bottom: 22px; width: 248px; }
-  .stats { right: 22px; bottom: 22px; }
+  .masthead {
+    top: calc(var(--sat) + 18px);
+    left: calc(var(--sal) + 22px);
+  }
+  /* Drop the kicker + sub at this width so the title fits comfortably
+     beside the centred search bar. */
+  .masthead__kicker { display: none; }
+  .masthead__sub { display: none; }
+  .masthead__rule { margin-top: 6px; width: 40px; }
+  .masthead__title { font-size: 18px; }
+  .controls { top: calc(var(--sat) + 18px); right: calc(var(--sar) + 22px); }
+  .topbar { width: min(360px, calc(100% - 320px)); }
+  .legend { left: calc(var(--sal) + 22px); bottom: calc(var(--sab) + 22px); width: 248px; }
+  .stats { right: calc(var(--sar) + 22px); bottom: calc(var(--sab) + 22px); }
   :root { --sidebar-w: 360px; }
 }
 
-/* ─── Responsive ─ mobile ───────────────────────────────────── */
+/* ─── Responsive ─ mobile (≤720 px) ─────────────────────────── */
 
 @media (max-width: 720px) {
+  /* Masthead — reserve room on the right for the controls cluster
+     (two 40-pt icon buttons + safe-area inset). */
   .masthead {
-    position: fixed;
-    top: 14px;
-    left: 16px;
-    right: 60px;
+    top: calc(var(--sat) + 14px);
+    left: calc(var(--sal) + 16px);
+    right: calc(var(--sar) + 102px);
   }
   .masthead__title { font-size: 18px; }
-  .masthead__kicker { font-size: 9px; letter-spacing: 0.18em; }
+  .masthead__kicker { font-size: 9.5px; letter-spacing: 0.18em; }
   .masthead__sub { display: none; }
   .masthead__rule { width: 36px; margin-top: 6px; }
 
+  /* Search bar — pinned bottom, safe-area aware. Bumped padding to
+     keep iOS from auto-zooming on focus (input must be ≥16px). */
   .topbar {
     top: auto;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
+    bottom: calc(var(--sab) + 14px);
+    left: calc(var(--sal) + 14px);
+    right: calc(var(--sar) + 14px);
     transform: none;
     width: auto;
     max-width: none;
   }
+  .search__input {
+    padding: 14px 16px 14px 42px;
+    font-size: 16px;
+    border-radius: var(--r-3);
+  }
+  .search__icon { left: 14px; }
+  .search__clear { width: 32px; height: 32px; right: 6px; }
 
   .search__results {
     position: absolute;
-    bottom: calc(100% + 6px);
+    bottom: calc(100% + 8px);
     left: 0;
     right: 0;
-    max-height: 50vh;
+    max-height: 60vh;
+    border-radius: var(--r-3);
   }
+  .search__hint { padding: 10px 16px; }
+  .search__item { padding: 14px 16px; min-height: 52px; gap: 16px; }
+  .search__item-name { font-size: 15px; }
+  .search__item-swatch { width: 10px; height: 10px; }
 
-  .controls { top: 12px; right: 14px; gap: 4px; }
-  .icon-btn { width: 32px; height: 32px; }
+  /* Controls (top-right) */
+  .controls {
+    top: calc(var(--sat) + 12px);
+    right: calc(var(--sar) + 14px);
+    gap: 6px;
+  }
+  .icon-btn { width: 40px; height: 40px; border-radius: var(--r-3); }
+  .overview-btn { height: 40px; padding: 0 14px 0 10px; font-size: 13px; }
 
-  .overview-btn { height: 32px; padding: 0 10px 0 6px; font-size: 12px; }
-
+  /* Legend — full-width chip floating above the search bar. The 92 px
+     clearance accounts for the 50-ish-px search bar plus comfortable
+     breathing room. */
   .legend {
-    left: 16px;
-    right: 16px;
-    bottom: 78px;
+    left: calc(var(--sal) + 14px);
+    right: calc(var(--sar) + 14px);
+    bottom: calc(var(--sab) + 92px);
     width: auto;
   }
+  .legend__head { padding: 12px 16px 8px; min-height: 44px; align-items: center; }
+  .legend__kicker { font-size: 10.5px; }
+  .legend__collapse { width: 36px; height: 36px; border-radius: var(--r-2); }
+  .legend__tab {
+    min-height: 48px;
+    padding: 10px 6px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  .legend__body { padding: 14px 16px 16px; }
+  .legend__title { font-size: 15px; }
+  .legend__desc { font-size: 12px; margin-bottom: 12px; }
+  .legend__items { gap: 8px; }
+  .legend__item { font-size: 13px; }
+  .legend__stack { padding: 14px 16px; min-height: 48px; font-size: 13px; }
+  .legend__stack-switch { width: 32px; height: 18px; }
+  .legend__stack-switch::after { width: 14px; height: 14px; }
+  .legend__stack--on .legend__stack-switch::after { left: 16px; }
 
-  .stats { display: none; } /* tucked into sidebar/about on mobile */
+  /* Stats strip hidden — these totals live in the About modal. */
+  .stats { display: none; }
 
+  /* Attribution sits above the legend on phones (the search bar takes
+     the bottom 60-ish px, legend the next 100-ish, so float the pill
+     just above both in clear map space). */
+  .mapboxgl-ctrl-bottom-right {
+    bottom: calc(var(--sab) + 212px) !important;
+    right: calc(var(--sar) + 10px) !important;
+  }
+
+  /* Toast lifts above the legend so it isn't hidden by the layer chip. */
+  .toast { bottom: calc(var(--sab) + 216px); }
+
+  /* Bottom-sheet sidebar — taller, with home-indicator-safe scroll
+     padding so the closing citation isn't tucked under the indicator. */
   .sidebar {
     top: auto;
     bottom: 0;
     width: 100%;
-    height: 72dvh;
+    height: 86dvh;
+    max-height: 86dvh;
     border-left: none;
     border-top: 1px solid var(--rule-strong);
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    box-shadow: 0 -12px 32px rgba(26,24,23,0.10), 0 -4px 10px rgba(26,24,23,0.05);
   }
-
   .sidebar__head {
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+    padding: 24px 18px 12px;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
   }
-
-  .sidebar__name { font-size: 26px; }
-  .sidebar__lede { font-size: 15.5px; }
-  .sidebar__lede::first-letter { font-size: 36px; }
-
-  /* Drag handle visual */
+  /* Drag handle */
   .sidebar__head::before {
     content: '';
     position: absolute;
-    top: 7px;
+    top: 9px;
     left: 50%;
     transform: translateX(-50%);
-    width: 36px;
-    height: 4px;
-    border-radius: 2px;
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
     background: var(--rule-strong);
   }
-  .sidebar__head { padding-top: 18px; }
+  .sidebar__close { width: 40px; height: 40px; border-radius: var(--r-2); }
+  .sidebar__body {
+    padding: 20px 22px calc(var(--sab) + 48px);
+  }
+  .sidebar__name { font-size: 28px; }
+  .sidebar__lede { font-size: 15.5px; }
+  .sidebar__lede::first-letter { font-size: 38px; }
+  .phrase__speak { width: 36px; height: 36px; }
+  .sidebar__actions { gap: 8px; margin-top: 22px; padding-top: 18px; }
+  .sidebar__action { height: 44px; font-size: 13px; }
 
-  .modal { max-height: 88dvh; }
-  .modal__head { padding: 14px 18px; }
+  /* Modal — safe-area padded headers/footers. */
+  .modal { max-height: calc(100dvh - var(--sat) - var(--sab) - 28px); }
+  .modal__head { padding: 16px 20px; }
   .modal__title { font-size: 18px; }
-  .modal__body { padding: 16px 18px 22px; }
+  .modal__body { padding: 18px 20px calc(var(--sab) + 24px); }
+  .sidebar__close { /* re-used inside modal head */ }
 
   .hint { display: none; }
 }
 
-/* Hide masthead text only when very narrow */
-@media (max-width: 420px) {
+/* ─── Very narrow (≤380 px) — last-ditch tightening ─────────── */
+@media (max-width: 380px) {
+  .masthead {
+    right: calc(var(--sar) + 96px);
+  }
+  .masthead__title { font-size: 17px; }
   .masthead__kicker { display: none; }
   .masthead__rule { display: none; }
-  .masthead__title { font-size: 16px; }
+  .controls { gap: 5px; }
+  .icon-btn { width: 38px; height: 38px; }
+  .legend__tab { padding: 10px 4px; gap: 4px; font-size: 11.5px; }
+}
+
+/* ─── Short landscape — phones turned sideways ──────────────── */
+/* The bottom-sheet pattern is wrong here: 86 dvh of a 390-px-tall
+   screen swallows the map. Revert to a right-anchored side panel
+   and tighten the top chrome. */
+@media (orientation: landscape) and (max-height: 540px) {
+  .masthead { top: calc(var(--sat) + 10px); left: calc(var(--sal) + 16px); right: auto; }
+  .masthead__title { font-size: 17px; }
+  .masthead__kicker { display: none; }
+  .masthead__rule { display: none; }
+  .masthead__sub { display: none; }
+
+  .controls { top: calc(var(--sat) + 10px); right: calc(var(--sar) + 12px); }
+
+  /* Search bar back to top-centre — short height leaves no thumb zone */
+  .topbar {
+    top: calc(var(--sat) + 10px);
+    bottom: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(320px, calc(100% - 220px));
+    max-width: 320px;
+  }
+  .search__results {
+    position: static;
+    margin-top: 6px;
+    max-height: 60vh;
+  }
+
+  .legend {
+    bottom: calc(var(--sab) + 12px);
+    left: calc(var(--sal) + 14px);
+    right: auto;
+    width: 248px;
+  }
+
+  /* Sidebar back to a side panel so the map stays usable */
+  .sidebar {
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: auto;
+    width: min(340px, 55vw);
+    height: 100%;
+    max-height: 100%;
+    border-left: 1px solid var(--rule-strong);
+    border-top: none;
+    border-radius: 0;
+    box-shadow: var(--shadow-3);
+  }
+  .sidebar__head { padding: 14px 18px; border-radius: 0; }
+  .sidebar__head::before { display: none; }
+  .sidebar__body { padding: 18px 22px calc(var(--sab) + 32px); }
+
+  /* Stats strip eats too much room in short landscape — these totals
+     are also in the About modal. */
+  .stats { display: none; }
+
+  /* Attribution returns to a normal bottom-right corner — the legend
+     is narrow here and the side panel doesn't extend that low. */
+  .mapboxgl-ctrl-bottom-right {
+    bottom: calc(var(--sab) + 8px) !important;
+    right: calc(var(--sar) + 8px) !important;
+  }
 }

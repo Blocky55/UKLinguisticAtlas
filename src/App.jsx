@@ -100,7 +100,7 @@ const App = () => {
     setStacked(false)
     setZoomedIn(true)
     if (mapRef.current) {
-      const offset = !isMobile && selectedRegion ? [-190, 0] : (isMobile && selectedRegion ? [0, -window.innerHeight * 0.18] : [0, 0])
+      const offset = !isMobile && selectedRegion ? [-190, 0] : (isMobile && selectedRegion ? [0, -window.innerHeight * 0.36] : [0, 0])
       mapRef.current.flyTo({
         center: region.center,
         zoom: 7,
@@ -212,14 +212,16 @@ const App = () => {
             </motion.button>
           )}
         </AnimatePresence>
-        <button
-          className="icon-btn"
-          onClick={() => setShowShortcuts(true)}
-          aria-label="Keyboard shortcuts"
-          title="Keyboard shortcuts ( ? )"
-        >
-          <Icon name="keyboard" size={16} />
-        </button>
+        {!isMobile && (
+          <button
+            className="icon-btn"
+            onClick={() => setShowShortcuts(true)}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts ( ? )"
+          >
+            <Icon name="keyboard" size={16} />
+          </button>
+        )}
         <button
           className="icon-btn"
           onClick={() => setShowAbout(true)}

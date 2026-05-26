@@ -4,7 +4,10 @@ import { LAYERS, DIVERSITY_BANDS } from '../data/regions'
 
 const Legend = ({ activeLayer, onLayerChange, stacked, onStackedChange }) => {
   const [collapsed, setCollapsed] = useState(() =>
-    typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches
+    typeof window !== 'undefined' && (
+      window.matchMedia('(max-width: 720px)').matches ||
+      window.matchMedia('(orientation: landscape) and (max-height: 540px)').matches
+    )
   )
   const layer = LAYERS.find(l => l.id === activeLayer) || LAYERS[0]
 

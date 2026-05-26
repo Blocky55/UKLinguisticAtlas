@@ -41,7 +41,7 @@ const Map = ({
       touchPitch: false,
     })
 
-    m.addControl(new mapboxgl.AttributionControl({ compact: true }), 'top-right')
+    m.addControl(new mapboxgl.AttributionControl({ compact: true }), 'bottom-right')
 
     m.on('load', () => {
       loaded.current = true
@@ -228,9 +228,10 @@ const Map = ({
         const open = sidebarOpenRef.current
         const mobile = isMobileRef.current
         if (mobile) {
+          // Bottom-sheet takes ~86 dvh; leave just over the top strip visible.
           return open
-            ? { top: 60, right: 20, bottom: window.innerHeight * 0.72 + 30, left: 20 }
-            : { top: 80, right: 20, bottom: 120, left: 20 }
+            ? { top: 90, right: 20, bottom: window.innerHeight * 0.84 + 24, left: 20 }
+            : { top: 100, right: 20, bottom: 150, left: 20 }
         }
         return open
           ? { top: 80, right: 380 + 40, bottom: 80, left: 60 }
@@ -239,7 +240,8 @@ const Map = ({
 
       const computeOffset = () => {
         if (isMobileRef.current) {
-          return sidebarOpenRef.current ? [0, -window.innerHeight * 0.18] : [0, 0]
+          // Match the sheet height — push centred features into the top strip.
+          return sidebarOpenRef.current ? [0, -window.innerHeight * 0.36] : [0, 0]
         }
         return sidebarOpenRef.current ? [-190, 0] : [0, 0]
       }
