@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "An interactive cartographic survey of the dialects, indigenous languages, and linguistic diversity of the United Kingdom and Ireland.",
+  "author": "Alemerson Linus",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

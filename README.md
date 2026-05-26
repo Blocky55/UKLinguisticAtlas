@@ -4,6 +4,8 @@ An interactive cartographic survey of the languages and dialects spoken across t
 United Kingdom and Ireland — from the regional varieties of English to the
 Celtic tongues and the rising linguistic diversity of the postwar city.
 
+*Designed and built by Alemerson Linus.*
+
 The atlas presents three layers on a single Mapbox base map:
 
 - **Dialects** — five regional varieties of English (Mancunian, Scouse, Welsh

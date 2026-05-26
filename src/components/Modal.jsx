@@ -130,6 +130,20 @@ export const AboutModal = ({ onClose, totals }) => (
         not intended as exhaustive lexicons.
       </p>
     </section>
+
+    <div style={{
+      marginTop: 22,
+      paddingTop: 14,
+      borderTop: '1px solid var(--rule)',
+      fontFamily: 'var(--serif)',
+      fontStyle: 'italic',
+      fontSize: 12,
+      letterSpacing: '0.02em',
+      color: 'var(--ink-mute)',
+      textAlign: 'right',
+    }}>
+      Designed and built by Alemerson Linus
+    </div>
   </Modal>
 )
 
